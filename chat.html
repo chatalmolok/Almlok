@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>شات الملوك 👑</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="chat-container">
+    <h2>👑 شات الملوك 👑</h2>
+    <div id="messages" class="messages"></div>
+
+    <div class="input-container">
+      <input type="text" id="messageInput" placeholder="اكتب رسالتك..." />
+      <button id="sendBtn">إرسال</button>
+    </div>
+
+    <button id="logoutBtn" class="logout">تسجيل الخروج</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      query,
+      orderBy,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+    // ✅ إعداد Firebase الصحيح
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJhA1WkFsLZiQz5WZFWPFbdjxLPtG57ss",
+      authDomain: "lloo-756f7.firebaseapp.com",
+      projectId: "lloo-756f7",
+      storageBucket: "lloo-756f7.firebasestorage.app",
+      messagingSenderId: "951071688513",
+      appId: "1:951071688513:web:b0fc76afe09001365043c0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // ✅ حماية الصفحة
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        console.log("تم تسجيل الدخول:", user.email);
+        loadMessages();
+      }
+    });
+
+    // ✅ تحميل الرسائل
+    const messagesDiv = document.getElementById("messages");
+    function loadMessages() {
+      const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
+      onSnapshot(q, (snapshot) => {
+        messagesDiv.innerHTML = "";
+        snapshot.forEach((doc) => {
+          const msg = doc.data();
+          const msgEl = document.createElement("div");
+          msgEl.classList.add("message");
+          msgEl.textContent = `${msg.user}: ${msg.text}`;
+          messagesDiv.appendChild(msgEl);
+        });
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      });
+    }
+
+    // ✅ إرسال رسالة
+    const sendBtn = document.getElementById("sendBtn");
+    const messageInput = document.getElementById("messageInput");
+    sendBtn.addEventListener("click", async () => {
+      const text = messageInput.value.trim();
+      if (text === "") return;
+      const user = auth.currentUser;
+      if (!user) return;
+
+      await addDoc(collection(db, "messages"), {
+        user: user.email,
+        text: text,
+        timestamp: serverTimestamp(),
+      });
+      messageInput.value = "";
+    });
+
+    // ✅ تسجيل الخروج
+    const logoutBtn = document.getElementById("logoutBtn");
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "login.html";
+    });
+  </script>
+
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: "Cairo", sans-serif;
+      text-align: center;
+    }
+    .chat-container {
+      width: 90%;
+      max-width: 500px;
+      margin: 30px auto;
+      background: #111;
+      border: 2px solid gold;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 20px gold;
+    }
+    .messages {
+      height: 300px;
+      overflow-y: auto;
+      background: #000;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      padding: 10px;
+      text-align: left;
+    }
+    .message {
+      margin-bottom: 5px;
+    }
+    .input-container {
+      display: flex;
+      gap: 5px;
+    }
+    input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+    }
+    button {
+      background: gold;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .logout {
+      margin-top: 15px;
+      background: crimson;
+    }
+  </style>
+</body>
+</html>
