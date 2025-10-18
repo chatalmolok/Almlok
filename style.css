@@ -1,56 +1,73 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #0d1117;
-  color: #c9d1d9;
-  margin: 0;
-  padding: 0;
-}
+:root{
+    --bg:#050505;
+      --card:#0c0c0c;
+        --gold:#f6c400;
+          --muted:#bdbdbd;
+            --accent:#ffd94d;
+              --radius:12px;
+                font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+                }
+                *{box-sizing:border-box}
+                html,body{height:100%}
+                body{
+                  margin:0;
+                    background: linear-gradient(180deg,#000 0%, #050505 100%);
+                      color:#fff;
+                        -webkit-font-smoothing:antialiased;
+                          display:flex;
+                            align-items:center;
+                              justify-content:center;
+                              }
+                              .container{
+                                width:100%;
+                                  max-width:420px;
+                                    padding:18px;
+                                    }
+                                    .logo{text-align:center;margin-bottom:8px}
+                                    .logo h1{color:var(--gold);text-shadow:0 0 10px rgba(246,196,0,0.3);font-size:28px;margin:0}
 
-header {
-  background-color: #161b22;
-  padding: 10px 20px;
-  text-align: center;
-}
+                                    .card{
+                                      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+                                        border-radius:var(--radius);
+                                          padding:18px;
+                                            margin-bottom:14px;
+                                              box-shadow:0 8px 30px rgba(0,0,0,0.6);
+                                              }
+                                              .view{display:none}
+                                              .view.active{display:block}
+                                              h2{margin-top:0;color:var(--gold);text-align:center}
 
-.chat-container {
-  width: 90%;
-  max-width: 500px;
-  margin: 30px auto;
-  background-color: #161b22;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
-}
+                                              label{display:block;margin:8px 0 4px;color:var(--muted);font-size:14px}
+                                              input[type="text"],input[type="password"],input[type="email"],input[type="number"],textarea{
+                                                width:100%;
+                                                  padding:12px 14px;
+                                                    border-radius:10px;
+                                                      border:1px solid rgba(255,255,255,0.06);
+                                                        background:transparent;
+                                                          color:#fff;
+                                                          }
+                                                          textarea{min-height:80px;resize:vertical}
 
-.message {
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 8px;
-}
+                                                          .btn{
+                                                            display:inline-block;
+                                                              background:rgba(255,255,255,0.06);
+                                                                color:#fff;
+                                                                  border:none;padding:10px 16px;border-radius:10px;margin-top:12px;cursor:pointer;
+                                                                  }
+                                                                  .btn.gold{background:linear-gradient(180deg,var(--gold), #d6a700); color:#000; font-weight:700}
 
-.user {
-  background-color: #238636;
-  text-align: right;
-}
+                                                                  .link{background:none;border:none;color:var(--muted);cursor:pointer;padding:0;font-size:14px}
 
-.bot {
-  background-color: #30363d;
-  text-align: left;
-}
+                                                                  .row-between{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+                                                                  .checkbox input{margin-left:8px}
 
-input[type="text"] {
-  width: 80%;
-  padding: 8px;
-  border: none;
-  border-radius: 5px;
-  outline: none;
-}
+                                                                  .muted{color:var(--muted);text-align:center}
+                                                                  .small{font-size:12px;opacity:0.8}
 
-button {
-  padding: 8px 12px;
-  background-color: #238636;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  cursor: pointer;
+                                                                  .profile{display:flex;gap:12px;align-items:flex-start}
+                                                                  .avatar{width:84px;height:84px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--gold);box-shadow:0 6px 20px rgba(0,0,0,0.6)}
+                                                                  .chat-box{height:180px;background:rgba(255,255,255,0.02);border-radius:8px;padding:10px;overflow:auto;margin-bottom:8px}
+                                                                  .chat-input{display:flex;gap:8px}
+                                                                  .chat-input input{flex:1}
+                                                                  .admin-area{margin-top:8px;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px}
 }
