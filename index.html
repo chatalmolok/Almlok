@@ -41,4 +41,24 @@
 
                                                                                                                                       <script src="script.js"></script>
                                                                                                                                       </body>
+                                                                                                                                      <script type="module">
+                                                                                                                                            // نستورد مكتبة Firebase
+                                                                                                                                              import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+
+                                                                                                                                                // هنا نضيف باقي مكتبات Firebase لاحقاً (auth, firestore ...)
+
+                                                                                                                                                  // إعدادات مشروعك من Firebase
+                                                                                                                                                    const firebaseConfig = {
+                                                                                                                                                        apiKey: "AIzaSyDJhA1WkFsLZiQz5WZFWPFbdjxLPtG57ss",
+                                                                                                                                                            authDomain: "lloo-756f7.firebaseapp.com",
+                                                                                                                                                                projectId: "lloo-756f7",
+                                                                                                                                                                    storageBucket: "lloo-756f7.appspot.com",  <!-- تم تصحيحها -->
+                                                                                                                                                                        messagingSenderId: "951071688513",
+                                                                                                                                                                            appId: "1:951071688513:web:b0fc76afe09001365043c0"
+                                                                                                                                                                              };
+
+                                                                                                                                                                                // تفعيل Firebase
+                                                                                                                                                                                  const app = initializeApp(firebaseConfig);
+                                                                                                                                                                                    console.log("✅ Firebase Connected Successfully!");
+                                                                                                                                                                                    </script>
                                                                                                                                       </html>
