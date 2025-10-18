@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>شات الملوك | تسجيل الدخول</title>
+  <style>
+    body{margin:0;font-family:'Tajawal',sans-serif;background:#000;color:gold;display:flex;justify-content:center;align-items:center;height:100vh}
+    .card{background:#111;padding:28px;border-radius:16px;border:2px solid gold;max-width:420px;width:92%;box-shadow:0 0 20px rgba(212,175,55,0.12);text-align:center}
+    input{width:90%;padding:10px;margin:10px 0;border:none;border-bottom:2px solid gold;background:transparent;color:gold;font-size:16px;outline:none;border-radius:6px}
+    button{width:100%;padding:10px;background:gold;border:none;color:#000;font-weight:bold;cursor:pointer;font-size:18px;border-radius:8px;margin-top:10px}
+    label{display:flex;align-items:center;justify-content:center;gap:8px}
+    a{color:gold;text-decoration:none;display:block;margin-top:10px}
+    .msg{color:#bff7b0;margin-bottom:8px}
+    .error{color:#ff9b9b;margin-bottom:8px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>شات الملوك</h2>
+    <p class="msg" id="welcomeMsg" style="display:none"></p>
+    <input id="loginInput" type="text" placeholder="البريد الإلكتروني أو اسم المستخدم" />
+    <input id="loginPassword" type="password" placeholder="كلمة المرور" />
+    <label><input id="rememberMe" type="checkbox" /> تذكرني</label>
+    <button id="loginBtn">تسجيل الدخول</button>
+    <div id="loginFeedback" role="status" aria-live="polite"></div>
+    <a href="signup.html">إنشاء حساب جديد</a>
+    <a href="reset.html">نسيت كلمة المرور؟</a>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      setPersistence,
+      browserLocalPersistence,
+      browserSessionPersistence
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      where,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJhA1WkFsLZiQz5WZFWPFbdjxLPtG57ss",
+      authDomain: "lloo-756f7.firebaseapp.com",
+      projectId: "lloo-756f7",
+      storageBucket: "lloo-756f7.firebasestorage.app",
+      messagingSenderId: "951071688513",
+      appId: "1:951071688513:web:46f402720b38f15c5043c0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('new') === '1') {
+      const u = urlParams.get('u') || '';
+      const msg = document.getElementById('welcomeMsg');
+      msg.textContent = 'تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول — ' + decodeURIComponent(u);
+      msg.style.display = 'block';
+    }
+
+    const loginBtn = document.getElementById("loginBtn");
+    const feedback = document.getElementById("loginFeedback");
+
+    loginBtn.addEventListener("click", async () => {
+      feedback.textContent = "";
+      const input = document.getElementById("loginInput").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const remember = document.getElementById("rememberMe").checked;
+
+      if (!input || !password) {
+        feedback.className = "error";
+        feedback.textContent = "يرجى إدخال البيانات كاملة";
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = "جاري تسجيل الدخول...";
+
+      try {
+        let email = input;
+        if (!input.includes("@")) {
+          const usersRef = collection(db, "users");
+          const q = query(usersRef, where("username", "==", input));
+          const snap = await getDocs(q);
+          if (snap.empty) {
+            feedback.className = "error";
+            feedback.textContent = "اسم المستخدم غير موجود";
+            loginBtn.disabled = false;
+            loginBtn.textContent = "تسجيل الدخول";
+            return;
+          }
+          email = snap.docs[0].data().email;
+        }
+
+        if (remember) {
+          await setPersistence(auth, browserLocalPersistence);
+        } else {
+          await setPersistence(auth, browserSessionPersistence);
+        }
+
+        await signInWithEmailAndPassword(auth, email, password);
+        feedback.className = "msg";
+        feedback.textContent = "تم تسجيل الدخول بنجاح";
+        setTimeout(() => { window.location.href = "chat.html"; }, 700);
+      } catch (err) {
+        console.error(err);
+        feedback.className = "error";
+        if (err.code === "auth/wrong-password") {
+          feedback.textContent = "كلمة المرور غير صحيحة";
+        } else if (err.code === "auth/user-not-found") {
+          feedback.textContent = "المستخدم غير موجود";
+        } else {
+          feedback.textContent = err.message;
+        }
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = "تسجيل الدخول";
+      }
+    });
+  </script>
+</body>
+</html>

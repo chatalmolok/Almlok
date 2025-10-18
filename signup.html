@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>شات الملوك | إنشاء حساب جديد</title>
+  <style>
+    body{margin:0;font-family:'Tajawal',sans-serif;background:#000;color:gold;display:flex;justify-content:center;align-items:center;height:100vh}
+    .card{background:#111;padding:28px;border-radius:16px;border:2px solid gold;max-width:420px;width:92%;box-shadow:0 0 20px rgba(212,175,55,0.12);text-align:center}
+    input{width:90%;padding:10px;margin:10px 0;border:none;border-bottom:2px solid gold;background:transparent;color:gold;font-size:16px;outline:none;border-radius:6px}
+    button{width:100%;padding:10px;background:gold;border:none;color:#000;font-weight:bold;cursor:pointer;font-size:18px;border-radius:8px;margin-top:10px}
+    a{color:gold;text-decoration:none;display:block;margin-top:10px}
+    .msg{color:#bff7b0;margin-top:8px}
+    .error{color:#ff9b9b;margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>إنشاء حساب جديد</h2>
+    <input id="username" type="text" placeholder="اسم المستخدم (مطلوب)" />
+    <input id="email" type="email" placeholder="البريد الإلكتروني (مطلوب)" />
+    <input id="password" type="password" placeholder="كلمة المرور (مطلوب)" />
+    <button id="signupBtn">إنشاء الحساب</button>
+    <div id="feedback" class="msg" role="status" aria-live="polite"></div>
+    <a href="login.html">لديك حساب؟ تسجيل الدخول</a>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      where,
+      getDocs,
+      doc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJhA1WkFsLZiQz5WZFWPFbdjxLPtG57ss",
+      authDomain: "lloo-756f7.firebaseapp.com",
+      projectId: "lloo-756f7",
+      storageBucket: "lloo-756f7.firebasestorage.app",
+      messagingSenderId: "951071688513",
+      appId: "1:951071688513:web:46f402720b38f15c5043c0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const signupBtn = document.getElementById("signupBtn");
+    const feedback = document.getElementById("feedback");
+
+    async function isUsernameTaken(name) {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("username", "==", name));
+      const snap = await getDocs(q);
+      return !snap.empty;
+    }
+
+    signupBtn.addEventListener("click", async () => {
+      feedback.textContent = "";
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!username || !email || !password) {
+        feedback.className = "error";
+        feedback.textContent = "الرجاء تعبئة جميع الحقول";
+        return;
+      }
+
+      signupBtn.disabled = true;
+      signupBtn.textContent = "جاري الإنشاء...";
+
+      try {
+        const taken = await isUsernameTaken(username);
+        if (taken) {
+          feedback.className = "error";
+          feedback.textContent = "اسم المستخدم هذا مستخدم مسبقاً، اختر اسم آخر";
+          signupBtn.disabled = false;
+          signupBtn.textContent = "إنشاء الحساب";
+          return;
+        }
+
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+          username: username,
+          email: email,
+          createdAt: new Date().toISOString()
+        });
+
+        feedback.className = "msg";
+        feedback.textContent = "تم إنشاء الحساب بنجاح. سيتم توجيهك إلى تسجيل الدخول...";
+        setTimeout(() => {
+          window.location.href = "login.html?new=1&u=" + encodeURIComponent(username);
+        }, 1100);
+      } catch (err) {
+        console.error(err);
+        feedback.className = "error";
+        if (err.code === "auth/email-already-in-use") {
+          feedback.textContent = "هذا البريد مستخدم مسبقاً. حاول تسجيل الدخول أو استخدم بريد آخر.";
+        } else if (err.code === "auth/invalid-email") {
+          feedback.textContent = "البريد الإلكتروني غير صالح.";
+        } else if (err.code === "auth/weak-password") {
+          feedback.textContent = "كلمة المرور ضعيفة (6 أحرف على الأقل).";
+        } else {
+          feedback.textContent = "حدث خطأ: " + err.message;
+        }
+      } finally {
+        signupBtn.disabled = false;
+        signupBtn.textContent = "إنشاء الحساب";
+      }
+    });
+  </script>
+</body>
+</html>
