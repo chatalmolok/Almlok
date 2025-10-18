@@ -1,104 +1,77 @@
-// بسيط: تحكم بالعرض بين الشاشات + نقاط ربط Firebase لاحقًا
-(() => {
-  const views = {
-      login: document.getElementById('view-login'),
-          signup: document.getElementById('view-signup'),
-              forgot: document.getElementById('view-forgot'),
-                  chat: document.getElementById('view-chat')
-                    };
+// إعداد Firebase
+const firebaseConfig = {
+  apiKey: "ضع المفتاح هنا",
+    authDomain: "ضع رابط المشروع هنا",
+      projectId: "ضع معرف المشروع هنا",
+        storageBucket: "ضع اسم التخزين هنا",
+          messagingSenderId: "ضع الرقم هنا",
+            appId: "ضع App ID هنا"
+            };
 
-                      function show(view){
-                          Object.values(views).forEach(v => v.classList.remove('active'));
-                              views[view].classList.add('active');
-                                }
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
 
-                                  // التنقل
-                                    document.getElementById('to-signup').onclick = () => show('signup');
-                                      document.getElementById('to-login').onclick = () => show('login');
-                                        document.getElementById('to-forgot').onclick = () => show('forgot');
-                                          document.getElementById('back-login').onclick = () => show('login');
+            // عرض النماذج
+            function showRegister() {
+              document.getElementById('login-form').style.display = 'none';
+                document.getElementById('register-form').style.display = 'block';
+                }
+                function showLogin() {
+                  document.getElementById('login-form').style.display = 'block';
+                    document.getElementById('register-form').style.display = 'none';
+                    }
 
-                                            // نماذج
-                                              document.getElementById('form-login').onsubmit = (e) => {
-                                                  e.preventDefault();
-                                                      const username = document.getElementById('login-username').value.trim();
-                                                          const password = document.getElementById('login-password').value;
-                                                              const remember = document.getElementById('remember').checked;
+                    // تسجيل مستخدم جديد
+                    function registerUser() {
+                      const email = document.getElementById('register-email').value;
+                        const password = document.getElementById('register-password').value;
+                          const username = document.getElementById('register-username').value;
 
-                                                                  // TODO: اربط هنا مع Firebase Auth لتسجيل الدخول باسم المستخدم
-                                                                      // مثال: signInWithCustom(username,password) ... ثم:
-                                                                          fakeLogin(username, password, remember);
-                                                                            };
+                            if (!email || !password || !username) {
+                                alert("يرجى ملء جميع الحقول");
+                                    return;
+                                      }
 
-                                                                              document.getElementById('form-signup').onsubmit = (e) => {
-                                                                                  e.preventDefault();
-                                                                                      const email = document.getElementById('signup-email').value.trim();
-                                                                                          const username = document.getElementById('signup-username').value.trim();
-                                                                                              const p1 = document.getElementById('signup-password').value;
-                                                                                                  const p2 = document.getElementById('signup-password2').value;
-                                                                                                      if(p1 !== p2){ alert('كلمة المرور وتأكيدها غير متطابقتين'); return; }
-                                                                                                          // TODO: هنا تنشئ مستخدم Firebase Auth باستخدام الإيميل + تحفظ اسم المستخدم في قاعدة البيانات مع التحقق من عدم التكرار
-                                                                                                              fakeSignup(email, username);
-                                                                                                                };
+                                        auth.createUserWithEmailAndPassword(email, password)
+                                            .then((userCredential) => {
+                                                  const user = userCredential.user;
+                                                        return db.collection("users").doc(user.uid).set({
+                                                                username: username,
+                                                                        email: email,
+                                                                                rank: "مستخدم عادي"
+                                                                                      });
+                                                                                          })
+                                                                                              .then(() => {
+                                                                                                    alert("تم إنشاء الحساب بنجاح!");
+                                                                                                          showLogin();
+                                                                                                              })
+                                                                                                                  .catch((error) => alert(error.message));
+                                                                                                                  }
 
-                                                                                                                  document.getElementById('form-forgot').onsubmit = (e) => {
-                                                                                                                      e.preventDefault();
-                                                                                                                          const email = document.getElementById('forgot-email').value.trim();
-                                                                                                                              // TODO: call Firebase sendPasswordResetEmail(email)
-                                                                                                                                  alert('تم طلب رابط إعادة التعيين (تجريبي)');
-                                                                                                                                    };
+                                                                                                                  // تسجيل الدخول
+                                                                                                                  function loginUser() {
+                                                                                                                    const email = document.getElementById('login-email').value;
+                                                                                                                      const password = document.getElementById('login-password').value;
 
-                                                                                                                                      // ملف الشخصي حفظ
-                                                                                                                                        document.getElementById('save-profile').onclick = () => {
-                                                                                                                                            const name = document.getElementById('profile-name').value.trim();
-                                                                                                                                                const age = document.getElementById('profile-age').value;
-                                                                                                                                                    const bio = document.getElementById('profile-bio').value.trim();
-                                                                                                                                                        // TODO: حفظ الملف في قاعدة بيانات المستخدمين (Firestore)
-                                                                                                                                                            console.log('حفظ الملف', {name, age, bio});
-                                                                                                                                                                alert('تم حفظ الملف (تجريبي)');
-                                                                                                                                                                  };
+                                                                                                                        auth.signInWithEmailAndPassword(email, password)
+                                                                                                                            .then((userCredential) => {
+                                                                                                                                  const user = userCredential.user;
+                                                                                                                                        db.collection("users").doc(user.uid).get().then((doc) => {
+                                                                                                                                                document.getElementById('login-form').style.display = 'none';
+                                                                                                                                                        document.getElementById('register-form').style.display = 'none';
+                                                                                                                                                                document.getElementById('profile').style.display = 'block';
+                                                                                                                                                                        document.getElementById('user-name').textContent = doc.data().username;
+                                                                                                                                                                                document.getElementById('user-email').textContent = doc.data().email;
+                                                                                                                                                                                      });
+                                                                                                                                                                                          })
+                                                                                                                                                                                              .catch((error) => alert("خطأ: " + error.message));
+                                                                                                                                                                                              }
 
-                                                                                                                                                                    // إرسال رسالة (تجريبي)
-                                                                                                                                                                      document.getElementById('send-msg').onclick = () => {
-                                                                                                                                                                          const txt = document.getElementById('message-input').value.trim();
-                                                                                                                                                                              if(!txt) return;
-                                                                                                                                                                                  // TODO: ارفع الرسالة لقاعدة البيانات وبيِّنها في chat-box
-                                                                                                                                                                                      const box = document.getElementById('chat-box');
-                                                                                                                                                                                          const p = document.createElement('p'); p.textContent = 'أنت: ' + txt;
-                                                                                                                                                                                              box.appendChild(p);
-                                                                                                                                                                                                  document.getElementById('message-input').value = '';
-                                                                                                                                                                                                      box.scrollTop = box.scrollHeight;
-                                                                                                                                                                                                        };
-
-                                                                                                                                                                                                          // تسجيل خروج تجريبي
-                                                                                                                                                                                                            document.getElementById('logout').onclick = () => {
-                                                                                                                                                                                                                // TODO: Firebase signOut
-                                                                                                                                                                                                                    show('login');
-                                                                                                                                                                                                                        alert('تم تسجيل الخروج (تجريبي)');
-                                                                                                                                                                                                                          };
-
-                                                                                                                                                                                                                            // منطقة مالك - تمكن عرض أزرار المالك بعد التحقق
-                                                                                                                                                                                                                              function setOwnerMode(isOwner){
-                                                                                                                                                                                                                                  document.getElementById('admin-area').style.display = isOwner ? 'block' : 'none';
-                                                                                                                                                                                                                                    }
-
-                                                                                                                                                                                                                                      // ----- أمثلة تجريبية (بدون Firebase) -----
-                                                                                                                                                                                                                                        function fakeLogin(u,p,remember){
-                                                                                                                                                                                                                                            // محاكاة: إذا كان اسم المستخدم "admin" اعتبره مالك
-                                                                                                                                                                                                                                                show('chat');
-                                                                                                                                                                                                                                                    document.getElementById('welcome-title').textContent = `أهلًا ${u || 'مستخدم'}`;
-                                                                                                                                                                                                                                                        setOwnerMode(u === 'admin');
-                                                                                                                                                                                                                                                          }
-                                                                                                                                                                                                                                                            function fakeSignup(email, username){
-                                                                                                                                                                                                                                                                alert('تم إنشاء الحساب (تجريبي). الآن سيتم العودة لتسجيل الدخول.');
-                                                                                                                                                                                                                                                                    show('login');
-                                                                                                                                                                                                                                                                        document.getElementById('login-username').value = username;
-                                                                                                                                                                                                                                                                          }
-
-                                                                                                                                                                                                                                                                            // ----- نقطة بدء للربط مع Firebase -----
-                                                                                                                                                                                                                                                                              // لاحقًا: ضع هنا تهيئة Firebase SDK مثل:
-                                                                                                                                                                                                                                                                                // const firebaseConfig = { apiKey: "...", authDomain: "...", ... };
-                                                                                                                                                                                                                                                                                  // firebase.initializeApp(firebaseConfig);
-                                                                                                                                                                                                                                                                                    // ثم استبدل TODO أعلاه باستدعاءات Firebase Auth + Firestore.
-
-                                                                                                                                                                                                                                                                                    })();
+                                                                                                                                                                                              // تسجيل الخروج
+                                                                                                                                                                                              function logoutUser() {
+                                                                                                                                                                                                auth.signOut().then(() => {
+                                                                                                                                                                                                    document.getElementById('profile').style.display = 'none';
+                                                                                                                                                                                                        document.getElementById('login-form').style.display = 'block';
+                                                                                                                                                                                                          });
+                                                                                                                                                                                                          }

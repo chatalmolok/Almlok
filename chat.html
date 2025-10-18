@@ -2,107 +2,43 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>شات الملوك 👑</title>
-  <style>
-    body {
-      background-color: black;
-      color: gold;
-      font-family: 'Tajawal', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      padding: 20px;
-    }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>شات الملوك 👑</title>
+        <link rel="stylesheet" href="style.css">
 
-    h2 {
-      text-shadow: 0 0 15px gold;
-      margin-bottom: 20px;
-    }
+          <!-- Firebase -->
+            <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+              <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+                <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+                </head>
+                <body>
+                  <div class="container">
+                      <h1>👑 شات الملوك 👑</h1>
 
-    #chat-box {
-      width: 90%;
-      max-width: 500px;
-      height: 400px;
-      background: #111;
-      border: 2px solid gold;
-      border-radius: 15px;
-      padding: 10px;
-      overflow-y: auto;
-      margin-bottom: 15px;
-    }
+                          <div id="login-form">
+                                <h2>تسجيل الدخول</h2>
+                                      <input type="text" id="login-email" placeholder="البريد الإلكتروني">
+                                            <input type="password" id="login-password" placeholder="كلمة المرور">
+                                                  <button onclick="loginUser()">دخول</button>
+                                                        <p>ما عندك حساب؟ <a href="#" onclick="showRegister()">إنشاء حساب جديد</a></p>
+                                                            </div>
 
-    .message {
-      margin: 5px 0;
-      padding: 8px;
-      background: rgba(255, 215, 0, 0.1);
-      border-radius: 8px;
-    }
+                                                                <div id="register-form" style="display:none;">
+                                                                      <h2>إنشاء حساب جديد</h2>
+                                                                            <input type="text" id="register-username" placeholder="اسم المستخدم">
+                                                                                  <input type="email" id="register-email" placeholder="البريد الإلكتروني">
+                                                                                        <input type="password" id="register-password" placeholder="كلمة المرور">
+                                                                                              <button onclick="registerUser()">إنشاء</button>
+                                                                                                    <p>عندك حساب؟ <a href="#" onclick="showLogin()">تسجيل الدخول</a></p>
+                                                                                                        </div>
 
-    #message-input {
-      width: 70%;
-      padding: 10px;
-      border: 2px solid gold;
-      border-radius: 10px;
-      background: transparent;
-      color: gold;
-    }
+                                                                                                            <div id="profile" style="display:none;">
+                                                                                                                  <h2>مرحبا بك <span id="user-name"></span> 👑</h2>
+                                                                                                                        <p>البريد: <span id="user-email"></span></p>
+                                                                                                                              <button onclick="logoutUser()">تسجيل خروج</button>
+                                                                                                                                  </div>
+                                                                                                                                    </div>
 
-    #send-btn {
-      padding: 10px 20px;
-      background-color: gold;
-      border: none;
-      border-radius: 10px;
-      color: black;
-      cursor: pointer;
-      margin-right: 5px;
-    }
-
-    #send-btn:hover {
-      background-color: #ffcc00;
-    }
-  </style>
-</head>
-<body>
-
-  <h2>👑 مرحباً بك في شات الملوك 👑</h2>
-  <div id="chat-box"></div>
-
-  <div>
-    <input type="text" id="message-input" placeholder="اكتب رسالتك...">
-    <button id="send-btn">إرسال</button>
-  </div>
-
-  <script>
-    const username = localStorage.getItem("username");
-    if (!username) {
-      window.location.href = window.location.origin + "/index.html";
-    }
-
-    const chatBox = document.getElementById("chat-box");
-    const messageInput = document.getElementById("message-input");
-    const sendBtn = document.getElementById("send-btn");
-
-    sendBtn.addEventListener("click", sendMessage);
-    messageInput.addEventListener("keypress", e => {
-      if (e.key === "Enter") sendMessage();
-    });
-
-    function sendMessage() {
-      const msg = messageInput.value.trim();
-      if (msg === "") return;
-
-      const msgDiv = document.createElement("div");
-      msgDiv.className = "message";
-      msgDiv.textContent = `${username}: ${msg}`;
-      chatBox.appendChild(msgDiv);
-
-      messageInput.value = "";
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-  </script>
-
-</body>
-</html>
+                                                                                                                                      <script src="script.js"></script>
+                                                                                                                                      </body>
+                                                                                                                                      </html>
