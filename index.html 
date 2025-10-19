@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>👑 شات الملوك | الدردشة والملف الشخصي 👑</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Cairo", sans-serif;
+      background: black;
+      color: gold;
+      text-align: center;
+      padding: 10px;
+    }
+    h1 {
+      color: gold;
+      text-shadow: 0 0 15px gold;
+    }
+    .btn {
+      display: inline-block;
+      background: gold;
+      color: black;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 10px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 10px gold;
+    }
+    .chat-box {
+      display: none;
+      border: 2px solid gold;
+      border-radius: 15px;
+      padding: 15px;
+      background: #111;
+      box-shadow: 0 0 10px gold;
+      margin-top: 15px;
+    }
+    .profile-card {
+      display: none;
+      background: #111;
+      border: 2px solid gold;
+      border-radius: 20px;
+      padding: 20px;
+      max-width: 400px;
+      margin: 20px auto;
+      box-shadow: 0 0 15px gold;
+    }
+    input, textarea, select {
+      width: 90%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      background: #000;
+      color: gold;
+      text-align: center;
+    }
+    img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 2px solid gold;
+      object-fit: cover;
+    }
+    footer {
+      margin-top: 20px;
+      color: #777;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>👑 شات الملوك 👑</h1>
+  <p>أهلاً بك في مملكة التواصل الفخم.</p>
+
+  <div id="guestButtons">
+    <a href="login.html" class="btn">تسجيل الدخول</a>
+    <a href="signup.html" class="btn">إنشاء حساب جديد</a>
+  </div>
+
+  <!-- الملف الشخصي -->
+  <div id="profileCard" class="profile-card">
+    <h2>👑 الملف الشخصي 👑</h2>
+    <img id="profileImage" src="default.png" alt="صورة المستخدم"><br>
+    <input type="file" id="imageInput" accept="image/*">
+    <input type="text" id="name" placeholder="اسمك الكامل">
+    <input type="number" id="age" placeholder="العمر">
+    <select id="gender">
+      <option value="">اختر الجنس</option>
+      <option value="ذكر">ذكر</option>
+      <option value="أنثى">أنثى</option>
+    </select>
+    <textarea id="bio" rows="3" placeholder="نبذة قصيرة عنك..."></textarea>
+    <button class="btn" onclick="saveProfile()">💾 حفظ</button>
+  </div>
+
+  <!-- الشات -->
+  <div id="chatBox" class="chat-box">
+    <h3>💬 غرفة الدردشة</h3>
+    <div id="messages" style="height:150px; overflow:auto; background:#000; border-radius:10px; padding:10px; color:white;"></div>
+    <input id="messageInput" placeholder="اكتب رسالتك..." />
+    <button class="btn" onclick="sendMessage()">إرسال</button>
+  </div>
+
+  <footer>حقوق النشر © 2025 شات الملوك</footer>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+    // إعداد Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJhA1WkFsLZiQz5WZFWPFbdjxLPtG57ss",
+      authDomain: "lloo-756f7.firebaseapp.com",
+      projectId: "lloo-756f7",
+      storageBucket: "lloo-756f7.firebasestorage.app",
+      messagingSenderId: "951071688513",
+      appId: "1:951071688513:web:46f402720b38f15c5043c0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    const guestButtons = document.getElementById("guestButtons");
+    const profileCard = document.getElementById("profileCard");
+    const chatBox = document.getElementById("chatBox");
+
+    let currentUser;
+    const imageInput = document.getElementById("imageInput");
+    const profileImage = document.getElementById("profileImage");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        guestButtons.style.display = "none";
+        profileCard.style.display = "block";
+        chatBox.style.display = "block";
+
+        currentUser = user;
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          document.getElementById("name").value = data.name || "";
+          document.getElementById("age").value = data.age || "";
+          document.getElementById("gender").value = data.gender || "";
+          document.getElementById("bio").value = data.bio || "";
+          if (data.photoURL) profileImage.src = data.photoURL;
+        }
+      } else {
+        guestButtons.style.display = "block";
+        profileCard.style.display = "none";
+        chatBox.style.display = "none";
+      }
+    });
+
+    imageInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) profileImage.src = URL.createObjectURL(file);
+    });
+
+    window.saveProfile = async function() {
+      const name = document.getElementById("name").value;
+      const age = document.getElementById("age").value;
+      const bio = document.getElementById("bio").value;
+      const gender = document.getElementById("gender").value;
+
+      let photoURL = profileImage.src;
+
+      if (imageInput.files.length > 0) {
+        const file = imageInput.files[0];
+        const storageRef = ref(storage, `profiles/${currentUser.uid}.jpg`);
+        await uploadBytes(storageRef, file);
+        photoURL = await getDownloadURL(storageRef);
+      }
+
+      await setDoc(doc(db, "users", currentUser.uid), {
+        name, age, bio, gender, photoURL
+      });
+
+      alert("✅ تم حفظ ملفك الشخصي بنجاح!");
+    };
+
+    // دردشة تجريبية
+    window.sendMessage = function() {
+      const input = document.getElementById("messageInput");
+      const messages = document.getElementById("messages");
+      const msg = document.createElement("div");
+      msg.textContent = input.value;
+      messages.appendChild(msg);
+      input.value = "";
+    };
+  </script>
+
+</body>
+</html>
