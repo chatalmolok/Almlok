@@ -1,0 +1,76 @@
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { 
+    getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc 
+  } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJhA1WkFsLZiQz5WZFWPFbdjxLPtG57ss",
+    authDomain: "lloo-756f7.firebaseapp.com",
+    projectId: "lloo-756f7",
+    storageBucket: "lloo-756f7.firebasestorage.app",
+    messagingSenderId: "951071688513",
+    appId: "1:951071688513:web:b0fc76afe09001365043c0"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // 🧩 دالة تجلب اسم المستخدم من Firestore حسب الإيميل
+  async function getUserName(email) {
+    try {
+      const userRef = doc(db, "users", email);
+      const snapshot = await getDoc(userRef);
+      if (snapshot.exists()) {
+        return snapshot.data().username || email.split("@")[0];
+      } else {
+        return email.split("@")[0];
+      }
+    } catch (err) {
+      console.error("⚠️ خطأ أثناء جلب الاسم:", err);
+      return email.split("@")[0];
+    }
+  }
+
+  const messagesRef = collection(db, "messages");
+  const q = query(messagesRef, orderBy("timestamp", "asc"));
+  const messagesDiv = document.getElementById("messages");
+  const messageInput = document.getElementById("messageInput");
+  const sendBtn = document.getElementById("sendBtn");
+
+  // 🚀 إرسال الرسالة
+  sendBtn.addEventListener("click", async () => {
+    console.log("📨 الزر اشتغل!");
+    const text = messageInput.value.trim();
+    if (text === "") return;
+
+    const email = localStorage.getItem("userEmail");
+    const username = await getUserName(email);
+
+    await addDoc(messagesRef, {
+      username,
+      text,
+      timestamp: new Date()
+    });
+
+    messageInput.value = "";
+  });
+
+  // 💬 عرض الرسائل مباشرة
+  onSnapshot(q, (snapshot) => {
+    messagesDiv.innerHTML = "";
+    snapshot.forEach((docItem) => {
+      const data = docItem.data();
+      const messageElement = document.createElement("div");
+      messageElement.classList.add("message");
+
+      const time = data.timestamp?.toDate ? data.timestamp.toDate() : new Date();
+      const timeString = time.toLocaleTimeString("ar-IQ", { hour: "2-digit", minute: "2-digit" });
+
+      messageElement.innerHTML = `<strong>👑 ${data.username || "مجهول"} (🕒 ${timeString}):</strong> ${data.text}`;
+      messagesDiv.appendChild(messageElement);
+    });
+
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  });
+</script>
