@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>شات الملوك 👑 | الصفحة الرئيسية</title>
+<button onclick="window.location.href='profile.html'" 
+style="background-color: gold; color: black; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px gold;">
+👑 الملف الشخصي
+</button>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Tajawal', sans-serif;
+      background-color: #000;
+      color: gold;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: gold;
+      text-shadow: 0 0 15px gold;
+    }
+
+    p {
+      margin: 15px 0;
+      font-size: 18px;
+    }
+
+    a {
+      display: inline-block;
+      margin: 10px;
+      padding: 12px 20px;
+      background: gold;
+      color: black;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    a:hover {
+      background: #d4af37;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 15px;
+      color: #777;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>👑 شات الملوك 👑</h1>
+  <p>أهلاً بك في مملكة التواصل الفخم.</p>
+
+  <div>
+    <a href="login.html">تسجيل الدخول</a>
+    <a href="signup.html">إنشاء حساب جديد</a>
+  </div>
+
+  <footer>حقوق النشر © 2025 شات الملوك</footer>
+
+  <!-- ✅ سكربت Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+
+    // إعدادات مشروعك في Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJhA1WkFsLZiQz5WZFWPFbdjxLPtG57ss",
+      authDomain: "lloo-756f7.firebaseapp.com",
+      projectId: "lloo-756f7",
+      storageBucket: "lloo-756f7.firebasestorage.app",
+      messagingSenderId: "951071688513",
+      appId: "1:951071688513:web:b0fc76afe09001365043c0"
+    };
+
+    // تهيئة Firebase
+    const app = initializeApp(firebaseConfig);
+  </script>
+
+</body>
+</html>
