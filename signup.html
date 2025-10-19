@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>تسجيل عضوية - شات الملوك</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { background:#070707; color:gold; font-family: "Segoe UI", Tahoma, Arial; }
+    .card { max-width:520px; margin:30px auto; background:#0d0d0d; border:2px solid gold; padding:24px; border-radius:12px; }
+    input { width:100%; padding:10px; margin:8px 0; border-radius:8px; border:1px solid rgba(255,215,0,0.15); background:#000; color:gold; }
+    button { background:gold; color:#000; border:none; padding:10px 14px; border-radius:8px; cursor:pointer; width:100%; font-weight:bold; }
+    a { color:gold; text-decoration:none; }
+    label { color:#ddd; font-size:14px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2 style="text-align:center;margin:0 0 10px 0">تسجيل عضوية جديدة</h2>
+    <label>اسم العرض (اسم المستخدم)</label>
+    <input id="displayName" placeholder="اسم العرض" />
+    <label>البريد الإلكتروني</label>
+    <input id="email" type="email" placeholder="example@domain.com" />
+    <label>كلمة المرور</label>
+    <input id="password" type="password" placeholder="كلمة المرور (6 أحرف على الأقل)" />
+    <button id="signupBtn">إنشاء حساب</button>
+    <p style="margin-top:10px"><a href="login.html">العودة لتسجيل الدخول</a></p>
+    <div id="msg" style="margin-top:8px;color:#ffb100"></div>
+  </div>
+
+  <script type="module">
+    import { signUpWithEmailPassword } from './script.js';
+    const displayName = document.getElementById('displayName');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const msg = document.getElementById('msg');
+    document.getElementById('signupBtn').addEventListener('click', async () => {
+      msg.textContent = '';
+      try {
+        const e = email.value.trim();
+        const p = password.value.trim();
+        const d = displayName.value.trim() || null;
+        if (!e || !p) { msg.textContent = 'أدخل الإيميل وكلمة المرور'; return; }
+        await signUpWithEmailPassword(e, p, d);
+        msg.textContent = 'تم إنشاء الحساب. جاري التحويل...';
+        setTimeout(()=> location.href = 'chat.html', 900);
+      } catch (err) {
+        console.error(err);
+        msg.textContent = 'خطأ أثناء إنشاء الحساب: ' + (err.message || err);
+      }
+    });
+  </script>
+</body>
+</html>
