@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>👑 شات الملوك 👑</title>
+  <style>
+    body {
+      background-color: #000;
+      color: gold;
+      text-align: center;
+      font-family: "Cairo", sans-serif;
+    }
+    .btn {
+      display: inline-block;
+      background-color: gold;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 10px;
+      box-shadow: 0 0 10px gold;
+      text-decoration: none;
+    }
+    #profileButton {
+      display: none;
+      background-color: #8e44ad;
+      color: white;
+      box-shadow: 0 0 10px #8e44ad;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>👑 شات الملوك 👑</h1>
+  <p>أهلاً بك في مملكة التواصل الفخم.</p>
+
+  <div id="guestOptions">
+    <a href="login.html" class="btn">تسجيل الدخول</a>
+    <a href="signup.html" class="btn">إنشاء حساب جديد</a>
+  </div>
+
+  <button id="profileButton" class="btn" onclick="window.location.href='profile.html'">👑 الملف الشخصي</button>
+
+  <footer>حقوق النشر © 2025 شات الملوك</footer>
+
+  <!-- ✅ سكربت Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+    // إعدادات Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJhA1WkFsLZiQz5WZFWPFbdjxLPtG57ss",
+      authDomain: "lloo-756f7.firebaseapp.com",
+      projectId: "lloo-756f7",
+      storageBucket: "lloo-756f7.firebasestorage.app",
+      messagingSenderId: "951071688513",
+      appId: "1:951071688513:web:b0fc76afe09001365043c0"
+    };
+
+    // تهيئة Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // 🔒 التحقق من حالة تسجيل الدخول
+    onAuthStateChanged(auth, (user) => {
+      const profileButton = document.getElementById("profileButton");
+      const guestOptions = document.getElementById("guestOptions");
+
+      if (user) {
+        // ✅ المستخدم داخل => أخفي أزرار الدخول و أظهر زر الملف الشخصي
+        guestOptions.style.display = "none";
+        profileButton.style.display = "inline-block";
+      } else {
+        // 🚫 المستخدم مو داخل => أظهر أزرار الدخول وأخفي زر الملف الشخصي
+        guestOptions.style.display = "block";
+        profileButton.style.display = "none";
+      }
+    });
+  </script>
+
+</body>
+</html>
