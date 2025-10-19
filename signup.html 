@@ -1,91 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>إنشاء حساب جديد | شات الملوك 👑</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="container">
-    <h2>إنشاء حساب جديد 👑</h2>
-    <div id="alert" class="alert" style="display:none"></div>
-
-    <input type="email" id="email" placeholder="البريد الإلكتروني" required>
-    <input type="password" id="password" placeholder="كلمة المرور" required>
-    <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور" required>
-
-    <hr>
-
-    <h3>معلومات الملف الشخصي</h3>
-    <input type="text" id="displayName" placeholder="الاسم داخل الشات (لا يتكرر)" required>
-    <input type="number" id="age" placeholder="العمر" min="8">
-    <input type="text" id="bio" placeholder="نبذة عنك">
-    <input type="file" id="avatar" accept="image/*">
-
-    <button id="signupBtn">إنشاء الحساب</button>
-    <a href="login.html">لديك حساب؟ تسجيل الدخول</a>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-    import { getStorage, ref as sref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-storage.js";
-    import { db, createProfile, isDisplayNameUnique } from './script.js';
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDJhA1WkFsLZiQz5WZFWPFbdjxLPtG57ss",
-      authDomain: "lloo-756f7.firebaseapp.com",
-      projectId: "lloo-756f7",
-      storageBucket: "lloo-756f7.firebasestorage.app",
-      messagingSenderId: "951071688513",
-      appId: "1:951071688513:web:46f402720b38f15c5043c0"
-    };
-    initializeApp(firebaseConfig);
-
-    const auth = getAuth();
-    const storage = getStorage();
-
-    const alertBox = document.getElementById("alert");
-    function show(msg, color='gold', text='black') {
-      alertBox.style.display = 'block'; alertBox.style.background=color; alertBox.style.color=text; alertBox.textContent=msg;
-      setTimeout(()=> alertBox.style.display='none', 3000);
-    }
-
-    document.getElementById("signupBtn").addEventListener("click", async () => {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const confirm = document.getElementById("confirmPassword").value.trim();
-      const displayName = document.getElementById("displayName").value.trim();
-      const age = document.getElementById("age").value.trim();
-      const bio = document.getElementById("bio").value.trim();
-      const avatarFile = document.getElementById("avatar").files[0];
-
-      if (!email || !password || !confirm || !displayName) {
-        show("يرجى تعبئة الحقول الأساسية", 'red', 'white'); return;
-      }
-      if (password !== confirm) { show("كلمتا المرور غير متطابقتين", 'red', 'white'); return; }
-
-      // check unique display name
-      const unique = await isDisplayNameUnique(displayName);
-      if (!unique) { show("الاسم داخل الشات مستخدم مسبقًا، اختَر اسمًا آخر", 'red', 'white'); return; }
-
-      try {
-        const userCred = await createUserWithEmailAndPassword(getAuth(), email, password);
-        const uid = userCred.user.uid;
-        let avatarUrl = "";
-        if (avatarFile) {
-          const avRef = sref(storage, `avatars/${uid}-${avatarFile.name}`);
-          await uploadBytes(avRef, avatarFile);
-          avatarUrl = await getDownloadURL(avRef);
-        }
-        await createProfile(uid, { displayName, age: age||null, bio: bio||'', avatar: avatarUrl, role: 'user', email });
-        show("تم إنشاء الحساب بنجاح 🎉");
-        setTimeout(()=> window.location.href = 'login.html', 1500);
-      } catch (err) {
-        show("حدث خطأ أثناء التسجيل: " + (err.message||err), 'red', 'white');
-      }
-    });
-  </script>
-</body>
-</html>
